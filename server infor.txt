@@ -1,0 +1,2 @@
+ssh deploy@51.15.67.111
+password: f4Tps1n

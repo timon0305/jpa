@@ -1,0 +1,10 @@
+creationdate, name , type, number_view, product_price, 
+product_profit, product_cost, margin_percent, from products
+
+customers table, history table.
+
+
+double, long, string,
+
+the thing is, sometimes new columns are added, and
+ old are removed. is it possible that the program detects if there is a new column and displays?

@@ -1,0 +1,39 @@
+<div ngbDropdown placement="bottom-right" *ngIf="user$ | async as _user" class="kt-header__topbar-item kt-header__topbar-item--user">
+	<div ngbDropdownToggle class="kt-header__topbar-wrapper">
+		<span class="kt-header__topbar-welcome" *ngIf="greeting">Hi,</span>
+		<span class="kt-header__topbar-username" *ngIf="greeting">{{_user.fullname}}</span>
+		<!--<span *ngIf="badge" class="kt-header__topbar-icon"><b>{{_user.fullname|firstLetter}}</b></span>-->
+		<img *ngIf="avatar" alt="Pic" src="../assets/media/users/100_5.jpg">
+	</div>
+	<div ngbDropdownMenu class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-xl">
+		<!--begin: Head -->
+		<div class="kt-user-card kt-user-card--skin-dark kt-notification-item-padding-x" style="background-image: url(./assets/media/misc/bg-1.jpg)">
+			<div class="kt-user-card__avatar">
+				<img alt="Pic" src="../assets/media/users/100_5.jpg"/>
+				<span [hidden]="true" class="kt-badge kt-badge--lg kt-badge--rounded kt-badge--bold kt-font-success">
+					<!--{{_user.fullname|firstLetter}}-->
+				</span>
+			</div>
+			<div class="kt-user-card__name">
+				{{_user.fullname}}
+			</div>
+		</div>
+		<!--end: Head -->
+
+		<!--begin: Navigation -->
+		<div class="kt-notification">
+			<div class="kt-notification__custom">
+				<a href="javascript:;" (click)="logout()" class="btn btn-outline-brand btn-upper btn-sm btn-bold">Sign Out</a>
+			</div>
+		</div>
+		<!--end: Navigation -->
+
+		<!--begin: Navigation(alternative) -->
+		<ul class="kt-nav kt-margin-b-10 kt-hidden">
+			<li class="kt-nav__item kt-nav__item--custom kt-margin-t-15">
+				<a (click)="logout()" class="btn btn-label-brand btn-sm btn-bold">Sign Out</a>
+			</li>
+		</ul>
+		<!--end: Navigation(alternative) -->
+	</div>
+</div>

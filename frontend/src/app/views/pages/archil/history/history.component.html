@@ -1,0 +1,52 @@
+<div class="row">
+	<div class="col-md-4">
+		<input *ngIf="config.filtering" placeholder="Filter all columns"
+			   [ngTableFiltering]="config.filtering"
+			   class="form-control"
+			   (tableChanged)="onChangeTable(config)"/>
+	</div>
+	<div class="col-md-8">
+		<form (ngSubmit)="onSubmit()" #yourForm="ngForm" [formGroup]="unavailabilityForm">
+			<div class="row">
+				<div class="col-md-6 start_date">
+					<mat-form-field color="accent">
+						<mat-label>Select a Start Date</mat-label>
+						<input matInput [matDatepicker]="picker1" formControlName="startDate" >
+						<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+						<mat-datepicker #picker1></mat-datepicker>
+					</mat-form-field>
+				</div>
+				<div class="col-md-4 end_date">
+					<mat-form-field color="accent">
+						<mat-label>Select an End Date</mat-label>
+						<input matInput [matDatepicker]="picker2" [min]="unavailabilityForm.controls.startDate.value"
+							   formControlName="endDate" >
+						<mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+						<mat-datepicker #picker2 color="primary"></mat-datepicker>
+					</mat-form-field>
+				</div>
+				<div class="col-md-2">
+					<button type="submit"  mat-button class="btn btn-primary">Search</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<br>
+<ng-table [config]="config"
+		  (tableChanged)="onChangeTable(config)"
+		  (cellClicked)="onCellClick($event)"
+		  [rows]="rows" [columns]="columns">
+</ng-table>
+<pagination *ngIf="config.paging"
+			class="pagination-sm"
+			[(ngModel)]="page"
+			[totalItems]="length"
+			[itemsPerPage]="itemsPerPage"
+			[maxSize]="maxSize"
+			[boundaryLinks]="true"
+			[rotate]="false"
+			(pageChanged)="onChangeTable(config, $event)"
+			(numPages)="numPages = $event">
+</pagination>
+<pre *ngIf="config.paging" class="card card-block card-header">Page: {{page}} / {{numPages}}</pre>
