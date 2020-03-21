@@ -1,0 +1,21 @@
+# Upload script
+# first parameter is module name (auth/somos/admin)
+# second parameter should be ip address of server
+
+MODULE=$1
+SERVER=$2
+
+REMOTE=/home/nmsadmin/cps
+
+# Upload jar file
+scp $MODULE/target/*.jar nmsadmin@$SERVER:$REMOTE/$MODULE/cps-$MODULE-temp.jar
+
+# Stop the service if running, and make directories
+ssh -t nmsadmin@$SERVER "sudo service cps-$MODULE stop;
+              sudo service cps-$MODULE-dev stop;
+              mkdir -p $REMOTE/$MODULE;
+              mkdir -p $REMOTE/logs;
+              cp $REMOTE/$MODULE/cps-$MODULE-temp.jar $REMOTE/$MODULE/cps-$MODULE.jar;
+              cp $REMOTE/$MODULE/cps-$MODULE-temp.jar $REMOTE/$MODULE/cps-$MODULE-dev.jar;
+              rm -f $REMOTE/$MODULE/cps-$MODULE-temp.jar;
+              sudo service cps-$MODULE-dev start"

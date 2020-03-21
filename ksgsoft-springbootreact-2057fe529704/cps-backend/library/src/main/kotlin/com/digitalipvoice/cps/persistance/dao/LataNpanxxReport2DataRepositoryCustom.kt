@@ -1,0 +1,13 @@
+package com.digitalipvoice.cps.persistance.dao
+
+import com.digitalipvoice.cps.client.admin.models.TableQuery
+import com.digitalipvoice.cps.client.admin.models.TableResult
+
+interface LataNpanxxReport2DataRepositoryCustom {
+    /**
+     * Find users
+     */
+    fun searchLataNpanxxReport2Data(query: TableQuery): TableResult
+
+    fun searchLataNpanxxReport2DataByReportId(query: TableQuery, reportId: Long): TableResult
+}

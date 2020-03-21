@@ -1,0 +1,6 @@
+sudo systemctl enable /home/nmsadmin/cps/auth/cps-auth.service
+sudo systemctl enable /home/nmsadmin/cps/auth/cps-auth-dev.service
+sudo systemctl enable /home/nmsadmin/cps/admin/cps-admin.service
+sudo systemctl enable /home/nmsadmin/cps/admin/cps-admin-dev.service
+sudo systemctl enable /home/nmsadmin/cps/somos/cps-somos.service
+sudo systemctl enable /home/nmsadmin/cps/somos/cps-somos-dev.service

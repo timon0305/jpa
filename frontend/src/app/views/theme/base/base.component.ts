@@ -26,8 +26,6 @@ export class BaseComponent implements OnInit, OnDestroy {
 	// Public variables
 	selfLayout: string;
 	asideDisplay: boolean;
-	asideSecondary: boolean;
-	subheaderDisplay: boolean;
 	fluid: boolean;
 
 	// Private properties
@@ -81,7 +79,6 @@ export class BaseComponent implements OnInit, OnDestroy {
 		const config = this.layoutConfigService.getConfig();
 		this.selfLayout = objectPath.get(config, 'self.layout');
 		this.asideDisplay = objectPath.get(config, 'aside.self.display');
-		this.subheaderDisplay = objectPath.get(config, 'subheader.display');
 		this.fluid = objectPath.get(config, 'content.width') === 'fluid';
 
 		// let the layout type change

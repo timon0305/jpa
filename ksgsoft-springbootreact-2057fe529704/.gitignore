@@ -1,0 +1,32 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+
+# admin-frontend
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+# dependencies
+/node_modules
+package-lock.json
+# testing
+/coverage
+# production
+/build
+# misc
+.DS_Store
+.idea
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tar.gz
+
+# swagger codegen
+*/dist
+
+# api-spec
+*.idea
+dist
+
+# backend
+*.iml
+/.idea/
+target/
+output/
+

@@ -1,0 +1,14 @@
+# Define Data Source Settings
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/{DEV_DB_NAME}?useSSL=false
+spring.datasource.username={DEV_DB_USER}
+spring.datasource.password={DEV_DB_PASS}
+
+# Logging Configuration
+# logging.level.root=DEBUG
+logging.level.com.digitalipvoice.cps.*=DEBUG
+logging.level.org.springframework.web.*=DEBUG
+
+logging.file=${HOME}/cps/logs/auth-dev.log
+
+# Auto create or update
+spring.jpa.hibernate.ddl-auto=update

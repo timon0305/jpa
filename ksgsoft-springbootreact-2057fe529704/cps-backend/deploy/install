@@ -1,0 +1,27 @@
+# Compress admin, auth, somos folders into single tar file
+# First parameter is server address
+SERVER=$1
+
+# MAKE cps directory if not exist
+ssh -t nmsadmin@$SERVER "mkdir -p ~/cps"
+
+# Compress service scripts & conf files
+tar -czf cps.tar.gz admin auth somos services dev-start prod-start cps-apache.conf
+
+# Upload to server user directory
+scp cps.tar.gz nmsadmin@$SERVER:~/cps/
+
+# Delete local tar file
+rm -f cps.tar.gz
+
+# Extract file on server, create logs directory and remove remote tar file & run service script
+ssh -t nmsadmin@$SERVER "tar -xzf ~/cps/cps.tar.gz -C ~/cps/;
+        mkdir -p ~/cps/logs;
+        rm -f ~/cps/cps.tar.gz;
+        sh ~/cps/services;
+        mkdir -p ~/cps/frontend-admin;
+        mkdir -p ~/cps/frontend-customer;
+        sudo ln -s ~/cps/cps-apache.conf /etc/apache2/sites-enabled/cps-apache.conf
+        "
+
+

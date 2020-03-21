@@ -1,0 +1,8 @@
+{
+    "groupId": "com.digitalipvoice.cps.client",
+    "artifactId": "admin",
+    "artifactVersion": "1.0.0",
+    "modelPackage": "com.digitalipvoice.cps.client.admin.models",
+    "apiPackage": "com.digitalipvoice.cps.client.admin.api",
+    "java8": true
+}

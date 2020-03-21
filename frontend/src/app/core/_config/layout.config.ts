@@ -105,13 +105,6 @@ export class LayoutConfig {
 				},
 			},
 		},
-		subheader: {
-			display: true,
-			fixed: false,
-			layout: 'subheader-v2',
-			width: 'fixed',
-			style: 'transparent',
-		},
 		content: {
 			width: 'fixed',
 		},

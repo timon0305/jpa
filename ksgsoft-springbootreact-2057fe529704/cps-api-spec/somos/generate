@@ -1,0 +1,14 @@
+# Delete temporary directories
+rm -Rf dist
+
+# Generate dist directory
+mkdir dist
+
+#Generate Java Client
+swagger-codegen generate -i index.yaml -l java -o dist/java -c config.json --library feign
+
+swagger-codegen generate -i index.yaml -l html2 -o dist/documentation
+
+# Install to local maven repository
+cd dist/java
+mvn install -DskipTests

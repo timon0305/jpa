@@ -1,0 +1,15 @@
+[Unit]
+Description=cps-admin-dev
+After=syslog.target
+
+[Service]
+User=nmsadmin
+ExecStart=/home/nmsadmin/cps/admin/cps-admin-dev.jar
+SuccessExitStatus=143
+
+# This is important to read application.properties file and application-{profile}.properties file.
+WorkingDirectory=/home/nmsadmin/cps/admin
+
+[Install]
+WantedBy=multi-user.target
+

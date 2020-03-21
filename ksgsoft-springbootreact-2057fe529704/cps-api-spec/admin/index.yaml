@@ -1,0 +1,2244 @@
+swagger: '2.0'
+
+info:
+  version: 'v1'
+  title: 'CPS Admin Panel REST API'
+
+host: 'localhost:8082'
+basePath: '/api/v1'
+
+schemes:
+  - https
+  - http
+
+consumes:
+  - application/json
+
+produces:
+  - application/json
+
+# Tags definition
+tags:
+  - name: Session
+    description: 'Session Management API'
+  - name: Dashboard
+    description: 'Dashboard API'
+  - name: Profile
+    description: 'Profile Management API'
+  - name: System Settings
+    description: 'Pointer Record Management Requests'
+  - name: Roles
+    description: 'User Role Management API'
+  - name: User
+    description: 'User Management API'
+  - name: MGI Settings
+    description: 'MGI Connection settings'
+  - name: Notifications
+  - name: Tools
+    description: 'Tools'
+  - name: CPRGen
+    description: 'CPR Gen'
+  - name: Misc
+    description: 'Misc API'
+
+parameters:
+  authHeader:
+    name: Authorization
+    in: header
+    description: Bearer access_token
+    type: string
+    required: true
+
+  id:
+    name: id
+    in: path
+    description: id of Object
+    type: integer
+    format: int64
+    required: true
+
+  tableQuery:
+    name: body
+    in: body
+    description: table query
+    schema:
+      $ref: '#/definitions/TableQuery'
+    required: true
+
+responses:
+  '201':
+    description: 'Created object successfully'
+    schema:
+      $ref: '#/definitions/CreateResult'
+
+paths:
+  /session/login:
+    post:
+      tags:
+        - Session
+      summary: 'Login get access token & refresh token'
+      operationId: login
+      description: >-
+        This api will call authorization server's oauth/token with client id and client secret key which are assigned for the cps backend.
+        This api will send response from authorization server as response of this api excepting client id and client secret.
+        Returned token is JWT token
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/LoginRequest'
+          required: true
+      responses:
+        '200':
+          description: 'Login Success. Returns refresh token'
+          schema:
+            $ref: '#/definitions/LoginResponse'
+
+  /session/refresh:
+    post:
+      tags:
+        - Session
+      summary: 'Refresh '
+      operationId: refreshToken
+      description: >-
+        This api will call authorization server's oauth/token with client id and client secret key which are assigned for the cps backend and refresh the JWT token
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TokenRefreshRequest'
+          required: true
+      responses:
+        '200':
+          description: 'Refresh token succeed'
+          schema:
+            $ref: '#/definitions/TokenRefreshResponse'
+
+
+  # Dashboard
+  /versions:
+    get:
+      description: "Returns version logs"
+      tags:
+        - Dashboard
+      summary: "Version Logs"
+      operationId: getVersions
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: 'Version Logs'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/versionLogResponse'
+
+  /notifications:
+    get:
+      tags:
+      - Dashboard
+      summary: "Recent Notifications"
+      operationId: getNotifications
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: count
+          in: query
+          description: Retrieve Count
+          type: integer
+      responses:
+        '200':
+          description: 'Notification list'
+          schema:
+            $ref: '#/definitions/notificationsResponse'
+
+  # Profile
+  /profile:
+    get:
+      tags:
+      - Profile
+      summary: "User profile information"
+      operationId: getProfile
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Profile information
+          schema:
+            $ref: '#/definitions/ProfileDTO'
+
+  /profile/main:
+    put:
+      tags:
+      - Profile
+      summary: "Update main profile information"
+      operationId: updateProfileMain
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProfileMainDTO'
+      responses:
+        '200':
+          description: 'Successful update'
+
+  /profile/additional:
+    put:
+      tags:
+        - Profile
+      summary: "Update additional profile information"
+      operationId: updateProfileAdditional
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          required: true
+          description: Main Profile Object that needs to be updated
+          schema:
+            $ref: '#/definitions/ProfileAdditionalDTO'
+      responses:
+        '200':
+          description: 'Update succeed'
+          
+  /profile/ips:
+    put:
+      tags:
+        - Profile
+      summary: "Update ips information"
+      operationId: updateProfileIps
+      parameters: 
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          required: true
+          description: Ip addresses
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: 'Update succeed'
+          
+  /profile/password:
+    put:
+      tags:
+        - Profile
+      summary: "Update profile password"
+      operationId: updatePassword
+      parameters: 
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          required: true
+          description: Change password parameters
+          schema:
+            $ref: '#/definitions/ChangePasswordRequest'
+      responses:
+        '200':
+          description: 'Update succeed'
+
+  # Settings
+  /settings:
+    get:
+      tags:
+        - System Settings
+      summary: 'Retrieve System Settings'
+      operationId: getSystemSettings
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        200:
+          description: 'Succeed'
+          schema:
+            $ref: '#/definitions/SettingsDTO'
+
+  /settings/environment:
+    put:
+      tags:
+        - System Settings
+      summary: 'Update System Settings'
+      operationId: updateSystemEnvironmentSettings
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/SettingsEnvironmentDTO'
+      responses:
+        '200':
+          description: 'Successful operation'
+
+  /settings/timezone:
+    put:
+      tags:
+        - System Settings
+      summary: 'Update System Settings'
+      operationId: updateSystemTimezoneSettings
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/SettingsTimeZoneDTO'
+      responses:
+        '200':
+          description: 'Successful operation'
+
+  /settings/logo:
+    put:
+      tags:
+        - System Settings
+      summary: 'Update System Settings'
+      operationId: updateSystemLogoSettings
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/SettingsLogoDTO'
+      responses:
+        '200':
+          description: 'Successful operation'
+
+  /roles:
+    get:
+      tags:
+        - Roles
+      summary: 'Get all available roles'
+      operationId: getRoles
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: 'Searched Results'
+          schema:
+            $ref: '#/definitions/rolesQueryResult'
+
+    post:
+      tags:
+        - Roles
+      summary: 'Create a new role'
+      operationId: createRole
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/RoleDTO'
+      responses:
+        '201':
+          $ref: '#/responses/201'
+
+  '/roles/{id}':
+    get:
+      tags:
+        - Roles
+      summary: 'Get a role information'
+      operationId: getRoleDetail
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: 'Role details'
+          schema:
+            $ref: '#/definitions/RoleDTO'
+
+    put:
+      tags:
+        - Roles
+      summary: 'Update a role'
+      operationId: updateRole
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/RoleDTO'
+      responses:
+        200:
+          description: OK
+
+    delete:
+      tags:
+        - Roles
+      summary: 'Delete a role'
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        200:
+          description: Role deleted successfully
+
+  /users/search:
+    post:
+      tags:
+        - User
+      operationId: getUsers
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/tableQuery'
+      responses:
+        '200':
+          description: 'Searched Results'
+          schema:
+            $ref: '#/definitions/TableResult'
+  /users:
+    post:
+      tags:
+        - User
+      operationId: createUser
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateUserDTO'
+      responses:
+        '201':
+          $ref: '#/responses/201'
+
+  '/users/{id}':
+    get:
+      tags:
+        - User
+      operationId: getUserDetailById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProfileDTO'
+    delete:
+      tags:
+        - User
+      summary: Delete user
+      operationId: deleteUserById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        200:
+          description: OK
+
+  '/users/{id}/main':
+    put:
+      tags:
+        - User
+      summary: Update user main information
+      operationId: updateUserMainInformation
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProfileMainDTO'
+      responses:
+        '200':
+          description: 'Success'
+
+  '/users/{id}/additional':
+    put:
+      tags:
+        - User
+      summary: Update user additional information
+      operationId: updateUserAdditionalInformation
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name : body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProfileAdditionalDTO'
+      responses:
+        '200':
+          description: 'Success'
+
+  '/users/{id}/ips':
+    put:
+      tags:
+        - User
+      summary: Update user allowed ips information
+      operationId: updateUserIpInformation
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name : body
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: 'Success'
+  
+  '/users/{id}/password':
+    put:
+      tags:
+        - User
+      summary: Update password for a user
+      operationId: updateUserPassword
+      description: >
+        This api only requires newPassword parameter.
+      parameters: 
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/ChangePasswordRequest'
+      responses:
+        '200':
+          description: 'Success'
+            
+          
+  '/users/{id}/activate':
+    put:
+      tags:
+        - User
+      summary: Activates user
+      operationId: activateUser
+      parameters: 
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: 'Success'
+  
+  '/users/{id}/deactivate':
+    put:
+      tags:
+        - User
+      summary: Deactivates user
+      operationId: deactivateUser
+      parameters: 
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: 'Success'
+
+  /geo/states:
+    get:
+      tags:
+        - Misc
+      summary: Get all state informations
+      operationId: getAllStates
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: 'State Informations'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GeoStateDTO'
+
+  /geo/latas:
+    get:
+      tags:
+        - Misc
+      summary: Get all state informations
+      operationId: getAllLatas
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: 'State Informations'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GeoLataDTO'
+
+  /mgi/connections:
+    get:
+      tags:
+        - MGI Settings
+      summary: Get all connections
+      operationId: getSomosConnections
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: 'All SMS Connections'
+          schema:
+            $ref: '#/definitions/smsConnectionsResponse'
+
+    post:
+      tags:
+        - MGI Settings
+      summary: Create a somos connection
+      operationId: createSomosConnection
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/SMSConnectionDTO'
+      responses:
+        201:
+          $ref: '#/responses/201'
+
+  '/mgi/connections/{id}':
+    put:
+      tags:
+        - MGI Settings
+      summary: Update SOMOS connection
+      operationId: updateSomosConnection
+      description: 'Create a SOMOS Connection inforamtion. Do not put id when submitting'
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/SMSConnectionDTO'
+      responses:
+        '200':
+          description: Success
+
+    delete:
+      tags:
+        - MGI Settings
+      summary: Delete a somos connection
+      operationId: deleteSomosConnection
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+          
+  '/mgi/connections/{id}/activate':
+    put:
+      tags:
+        - MGI Settings
+      summary: 'Activate a sms connection (Set active to true)'
+      operationId: activateSMSConnection
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+    
+  '/mgi/connections/{id}/deactivate':
+    put:
+      tags:
+        - MGI Settings
+      summary: 'Dectivate a sms connection (Set active to false)'
+      operationId: DeactivateSMSConnection
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+
+  # /mgi/connections/status:
+  #   get:
+  #     tags:
+  #       - MGI Settings
+  #     summary: SOMOS Connections working status
+  #     operationId: checkMgiConnectionStatus
+  #     parameters:
+  #       - $ref: '#/parameters/authHeader'
+  #     responses:
+  #       '200':
+  #         description: >-
+  #           Service runing status. Doesn't indicate if sockets are really conencted to server.
+  #           Just indicates if CPS has opened connection to server or trying connection to server.
+  #         schema:
+  #           type: integer
+  #           enum: [0, 1]
+  #           description: '0 indicates running, 1 indicates not running'
+
+  /mgi/connections/start:
+    post:
+      tags:
+        - MGI Settings
+      summary: Start SOMOS Connections
+      operationId: startSomosConnections
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: success
+
+  /mgi/connections/stop:
+    post:
+      tags:
+        - MGI Settings
+      summary: Stop SOMOS Connections
+      operationId: stopSomosConnections
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: success
+
+  /mgi/connections/restart:
+    post:
+      tags:
+        - MGI Settings
+      summary: Restart somos connections
+      operationId: restartSomosConnections
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: success
+
+  /mgi/users/idro:
+    post:
+      tags:
+        - MGI Settings
+      summary: Get All SMS ID RespOrg matchings for cps registered users
+      operationId: getAllIdRo
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/tableQuery'
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/TableResult'
+
+  '/mgi/users/{id}/idro':
+    get:
+      tags:
+        - MGI Settings
+      summary: Get SMS ID RespOrg matching for specific user
+      operationId: getUserIdRo
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/SmsIDInfoDTO'
+
+    post:
+      tags:
+        - MGI Settings
+      summary: Set SMS ID RespOrg matching for specific user
+      operationId: updateUserIdRo
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/SmsIDInfoDTO'
+      responses:
+        '200':
+          description: success
+    
+    delete:
+      tags:
+        - MGI Settings
+      summary: Delete ID RO matching for user
+      operationId: deleteIdRo
+      parameters: 
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+  
+  '/cprgen/lerg/upload':
+    post:
+      tags:
+        - CPRGen
+      summary: Upload lerg csv files
+      operationId: uploadLerg
+      consumes: 
+        - multipart/form-data
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: file
+          in: formData
+          required: true
+          type: file
+          description: CSV file to be processed
+        - name: delimiter
+          in : formData
+          type: string
+          enum: [comma, pipe, tab, semicolon]
+          description: >-
+            CSV file column delimiter
+              * comma - **","**
+              * pipe - **"|"**
+              * tab - **"/t"**
+              * semicolon - **";"**
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/UploadLergResponse'
+              
+  '/cprgen/lerg/insert':
+    post:
+      tags:
+        - CPRGen
+      summary: Insert uploaded lerg csv file
+      operationId: insertLerg
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/InsertLergRequest'
+          required: true
+      responses:
+        '200':
+          description: success
+  
+  '/cprgen/lerg/search':
+    post:
+      tags:
+        - CPRGen
+      summary: Search lergs
+      operationId: searchLerg
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'Searched Results'
+          schema:
+            $ref: '#/definitions/TableResult'
+  
+  '/cprgen/rate/upload':
+    post:
+      tags:
+        - CPRGen
+      summary: Upload Rate Decks csv files
+      operationId: uploadRate
+      consumes: 
+        - multipart/form-data
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: file
+          in: formData
+          required: true
+          type: file
+          description: CSV file to be processed
+        - name: delimiter
+          in : formData
+          type: string
+          enum: [comma, pipe, tab, semicolon]
+          description: >-
+            CSV file column delimiter
+              * comma - **","**
+              * pipe - **"|"**
+              * tab - **"/t"**
+              * semicolon - **";"**
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/UploadRateResponse'
+  
+  '/cprgen/rate/insert':
+    post:
+      tags:
+        - CPRGen
+      summary: Insert uploaded rate csv file
+      operationId: insertRate
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/InsertRateRequest'
+          required: true
+      responses:
+        '200':
+          description: success
+  
+  '/cprgen/rate/list':
+    get:
+      tags:
+        - CPRGen
+      summary: Get Rate Decks List
+      operationId: getRateDeckList
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RateDeckDTO'
+  
+  '/cprgen/rate/list/rename/{id}':
+    put:
+      tags:
+        - CPRGen
+      summary: Rename Rate Deck
+      operationId: renameRateeDeck
+      consumes: 
+        - multipart/form-data
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: newName
+          in : formData
+          type: string
+          required: true
+      responses:
+        '200':
+          description: success
+  
+  '/cprgen/rate/list/delete/{id}':
+    delete:
+      tags:
+        - CPRGen
+      summary: Delete Rate Deck
+      operationId: deleteRateDeck
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+  
+  '/cprgen/rate/search':
+    post:
+      tags:
+        - CPRGen
+      summary: Search rates
+      operationId: searchRate
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'Searched Results'
+          schema:
+            $ref: '#/definitions/TableResult'
+            
+  '/cprgen/cdr/upload':
+    post:
+      tags:
+        - CPRGen
+      summary: Upload CDRs csv files
+      operationId: uploadCDR
+      consumes: 
+        - multipart/form-data
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: file
+          in: formData
+          required: true
+          type: file
+          description: CSV file to be processed
+        - name: delimiter
+          in : formData
+          type: string
+          enum: [comma, pipe, tab, semicolon]
+          description: >-
+            CSV file column delimiter
+              * comma - **","**
+              * pipe - **"|"**
+              * tab - **"/t"**
+              * semicolon - **";"**
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/UploadCDRResponse'
+  
+  '/cprgen/cdr/insert':
+    post:
+      tags:
+        - CPRGen
+      summary: Insert uploaded CDRs csv file
+      operationId: insertCDR
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/InsertCDRRequest'
+          required: true
+      responses:
+        '200':
+          description: success
+  
+  '/cprgen/cdr/search':
+    post:
+      tags:
+        - CPRGen
+      summary: Search CDRs
+      operationId: searchCDR
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'Searched Results'
+          schema:
+            $ref: '#/definitions/TableResult'
+
+  '/cprgen/lata_npanxx_report_1':
+    post:
+      tags:
+        - CPRGen
+      summary: Generate Lata Npanxx Report1
+      operationId: generateLataNpanxxReport1
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: 'Success'
+
+  '/cprgen/lata_npanxx_report_1/search':
+    post:
+      tags:
+        - CPRGen
+      summary: Get Lata Npanxx Report1 List
+      operationId: searchLataNpanxxReport1
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'Searched LataNpanxxReport1'
+          schema:
+            $ref: '#/definitions/TableResult'
+            
+  '/cprgen/lata_npanxx_report_2/list':
+    get:
+      tags:
+        - CPRGen
+      summary: Get all lata npanxx report1
+      operationId: getLataNpanxxReport2List
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: 'All LataNpanxxReport2 List'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/LataNpanxxReport2DTO'
+              
+  '/cprgen/lata_npanxx_report_2/search':
+    post:
+      tags:
+        - CPRGen
+      summary: search LataNpanxxReport2
+      operationId: searchLataNpanxxReport2
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'Searched RateReports'
+          schema:
+            $ref: '#/definitions/TableResult'
+  
+  '/cprgen/lata_npanxx_report_2':
+    post:
+      tags:
+        - CPRGen
+      summary: Generate LataNpanxxReport2
+      operationId: generateLataNpanxxReport2
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/LataNpanxxReport2Request'
+          required: true
+      responses:
+        '200':
+          description: 'Success'
+  
+  '/cprgen/lata_npanxx_report_2/{id}':
+    post:
+      tags:
+        - CPRGen
+      summary: Get User's LataNpanxxReport2 data with specific id
+      operationId: searchLataNpanxxReport2DataById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'view specific report'
+          schema:
+            $ref: '#/definitions/TableResult'
+            
+    delete:
+      tags:
+        - CPRGen
+      summary: Delete LataNpanxxReport2
+      operationId: deleteLataNpanxxReport2ById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: 'delete done'
+            
+  '/cprgen/lata_npanxx_report_2/{id}/download':
+    post:
+      tags:
+        - CPRGen
+      produces:
+        - application/csv
+      summary: download LataNpanxxReport2 data
+      operationId: downloadLataNpanxxReport2DataById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+          schema:
+            type: file
+            
+  '/cprgen/lcr_report/list':
+    get:
+      tags:
+        - CPRGen
+      summary: Get all lcr reports
+      operationId: getLCRReportList
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      responses:
+        '200':
+          description: 'All LCRReport List'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/LcrReportDTO'
+              
+  '/cprgen/lcr_report/search':
+    post:
+      tags:
+        - CPRGen
+      summary: Get LcrReport List
+      operationId: getLcrReportList
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'Searched LcrReports'
+          schema:
+            $ref: '#/definitions/TableResult'
+  
+  '/cprgen/lcr_report':
+    post:
+      tags:
+        - CPRGen
+      summary: Generate LcrReport
+      operationId: generateLcrReport
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/LCRReportRequest'
+          required: true
+      responses:
+        '200':
+          description: 'Success'
+  
+  '/cprgen/lcr_report/{id}':
+    post:
+      tags:
+        - CPRGen
+      summary: Get User's LcrReports with specific id
+      operationId: searchLCRReportById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'view specific report'
+          schema:
+            $ref: '#/definitions/TableResult'
+            
+    delete:
+      tags:
+        - CPRGen
+      summary: Delete LCR Report
+      operationId: deleteLCRReportById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: 'delete done'
+            
+  '/cprgen/lcr_report/{id}/download':
+    post:
+      tags:
+        - CPRGen
+      produces:
+        - application/csv
+      summary: download lcr report data
+      operationId: downloadLcrReportDataById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+          schema:
+            type: file
+            
+  '/cprgen/cpr_report':
+    post:
+      tags:
+        - CPRGen
+      summary: Create new CPR Report
+      operationId: createCPRReport
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/CreateCprReportRequest'
+
+      responses:
+        '200':
+          description: success
+
+    get:
+      tags:
+        - CPRGen
+      summary: get cpr report list
+      operationId: getCPRReports
+      description: >-
+        This api returns paged result of cpr report.
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/TableResult'
+            
+  '/cprgen/cpr_report/{id}':
+    post:
+      tags:
+        - CPRGen
+      summary: cpr report result query
+      operationId: getCprReportDataById
+      description: >-
+        Return cpr report data
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/TableResult'
+            
+  '/cprgen/cpr_report/{id}/download':
+    post:
+      tags:
+        - CPRGen
+      produces:
+        - application/csv
+      summary: download cpr report data
+      operationId: downloadCprReportDataById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+          schema:
+            type: file
+            
+  '/cprgen/cpr_report/{id}/download_npanxx':
+    post:
+      tags:
+        - CPRGen
+      produces:
+        - application/csv
+      summary: download cpr npanxx report data
+      operationId: downloadCprReportNpaNxxDataById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+          schema:
+            type: file
+            
+  '/cprgen/cpr_report/{id}/summary':
+    get:
+      tags:
+        - CPRGen
+      summary: get cpr report summary
+      operationId: getCPRReportSummary
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/CprReportSummary'
+            
+  '/tools/activity_log':
+    post:
+      tags:
+        - Tools
+      summary: View activity log
+      operationId: activityLog
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TableQuery'
+          required: true
+      responses:
+        '200':
+          description: 'Searched Results'
+          schema:
+            $ref: '#/definitions/TableResult'
+            
+  '/tools/actiivty_log/{id}':
+    get:
+      tags:
+        - Tools
+      summary: Get Message Details by SMSMessage Id
+      operationId: getSomosMessageById
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: >-
+            Somos Message Details, Schema is the same as DcmMessageDTO in somos api spec.
+  
+  '/notification/subscribe':
+    get:
+      tags:
+        - Notifications
+      summary: Notifcation Stream api
+      operationId: subscribeNotifications
+      parameters:
+        - $ref: '#/parameters/authHeader'
+      description: >-
+        This is done by webflux api on back-end
+        Same api exists on somos back-end
+      responses:
+        '200':
+          description: >-
+            Event stream
+            
+  '/notification/test_subscribe':
+    get:
+      tags:
+        - Notifications
+      summary: Notification Stream test api
+      operationId: testSubscribeNotification
+      description: >- 
+        This api is for testing purpose of subscribe api
+      responses:
+        '200':
+          description: Success
+      
+definitions:
+  LoginRequest:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      captchaResponse:
+        type: string
+        description: Captcha 
+    required:
+      - username
+      - password
+
+  LoginResponse:
+    type: object
+    properties:
+      oauthToken:
+        description: >-
+          This token is valid for 60 mins. and should be passed as
+          'Authorization: Bearer oauthToken' header when invoking the APIs
+        type: string
+      refreshToken:
+        type: string
+        example: ab2603d1-c067-383e-adc9-51217043cc92
+        description: >-
+          This token is valid for 24hrs. and should be used for obtaining a new
+          token using the OAuth 2.0 refresh_grant flow.
+      scope:
+        type: string
+        example: default
+        description: This value is always 'default'
+      expiresIn:
+        type: integer
+        example: 3600
+        description: Number of seconds the token is valid.
+      privileges:
+        type: array
+        items:
+          type: string
+        description: Granted privileges for user
+      profile:
+        $ref: '#/definitions/LoginProfile'
+  
+  LoginProfile:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: user id
+      username:
+        type: string
+        description: user name
+      firstName:
+        type: string
+        description: First Name
+      lastName:
+        type: string
+        description: Last Name
+      roles:
+        type: array
+        items:
+          $ref: '#/definitions/LoginRole'
+        description: Available roles for this user
+  
+  LoginRole:
+    type: object
+    properties:
+      id: 
+        type: integer
+        format: int64
+        description: role id
+      name: 
+        type: string
+        description: role name
+    
+  TokenRefreshRequest:
+    type: object
+    properties:
+      refreshToken:
+        type: string
+        description: >-
+          Refresh Token
+    required:
+      - refreshToken
+
+  TokenRefreshResponse:
+    type: object
+    properties:
+      oauthToken:
+        description: >-
+          This token is valid for 60 mins. and should be passed as
+          'Authorization: Bearer oauthToken' header when invoking the APIs
+          This will be JWT.
+        type: string
+      refreshToken:
+        type: string
+        example: ab2603d1-c067-383e-adc9-51217043cc92
+        description: >-
+          This token is valid for 24hrs. and should be used for obtaining a new
+          token using the OAuth 2.0 refresh_grant flow.
+      scope:
+        type: string
+        example: default
+        description: This value is always 'default'
+      expiresIn:
+        type: integer
+        example: 3600
+        description: Number of seconds the token is valid.
+  
+  versionLogResponse:
+    type: array 
+    items:
+      $ref: '#/definitions/VersionLogDTO'
+
+  notificationsResponse:
+    type: array
+    items:
+      $ref: '#/definitions/NotificationDTO'
+      
+  VersionLogDTO:
+    type: object
+    properties:
+      version:
+        type: string
+      description:
+        type: string
+    description: Version Log Data Transfer Object
+
+  NotificationDTO:
+    description: Notification Data Transfer Object
+    type: object
+    properties:
+      type: 
+        type: integer
+        description: Notificaiton Type (Error, Info ...)
+      section:
+        type: integer
+        description: Notification Section (System, User, ... Other functionalities)
+      time:
+        type: string
+      message:
+        type: string
+      description:
+        type: string
+
+  ProfileDTO:
+    description: Profile Information DTO
+    type: object
+    properties:
+      main:
+        $ref: '#/definitions/ProfileMainDTO'
+      additional:
+        $ref: '#/definitions/ProfileAdditionalDTO'
+      ips:
+        type: array
+        items:
+          type: string
+
+  ProfileMainDTO:
+    description: Profile Main Information DTO
+    type: object
+    properties:
+      username:
+        type: string
+      role:
+        type: string
+      roleId:
+        type: integer
+        format: int64
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+
+  ProfileAdditionalDTO:
+    description: Profile Additional Information DTO
+    type: object
+    properties:
+      country:
+        type: string
+      address:
+        type: string
+      province:
+        type: string
+      city:
+        type: string
+      zipcode:
+        type: string
+      tel1:
+        type: string
+      tel2:
+        type: string
+      mobile:
+        type: string
+      fax:
+        type: string
+        
+  ChangePasswordRequest:
+    description: Change Password Request Object
+    type: object
+    properties:
+      oldPassword:
+        type: string
+      newPassword:
+        type: string
+
+  SettingsDTO:
+    type: object
+    description: Settings Object
+    properties:
+      environment:
+        $ref: '#/definitions/SettingsEnvironmentDTO'
+      logos:
+        type: object
+        properties:
+          logo:
+            type: string
+            description: Logo Image URL
+          banner:
+            type: string
+            description: Banner Image URL
+          icon:
+            type: string
+            description: Icon Image URL
+      timezone:
+        $ref: '#/definitions/SettingsTimeZoneDTO'
+
+  SettingsEnvironmentDTO:
+    type: object
+    properties:
+      publishType:
+        type: integer
+        description: 'Publish Type. 1: Testing, 0: Production'
+      temporaryDirectory:
+        type: string
+        description: Temporary Download Directory
+
+  SettingsTimeZoneDTO:
+    type: object
+    properties:
+      timezone:
+        type: string
+        description: Timezone
+      dashboardTimeFormat:
+        type: string
+        enum: ['Local', 'UTC']
+        description: Dashboard time format
+
+  SettingsLogoDTO:
+    type: object
+    properties:
+      logo:
+        type: string
+        description: Base64 encoded logo image data
+      banner:
+        type: string
+        description: Base64 encoded banner image data
+      icon:
+        type: string
+        description: Base64 encoded icon image data
+
+  RoleDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+        description: Role name
+      description:
+        type: string
+        description: Role Description
+      privileges:
+        type: array
+        items:
+          type: string
+        description: Privilege names
+    required:
+      - name
+      - privileges
+      
+  rolesQueryResult:
+    type: array
+    items:
+      $ref: '#/definitions/RoleDTO'
+
+  CreateUserDTO:
+    type: object
+    properties:
+      username:
+        type: string
+        description: Unique user name
+      role:
+        type: integer
+        format: int64
+        description: User role id
+      email:
+        type: string
+        description: User email address
+      firstName:
+        type: string
+        description: User's first name
+      lastName:
+        type: string
+        description: User's last name
+      password:
+        type: string
+        description: log on password
+      country:
+        type: string
+      address:
+        type: string
+      province:
+        type: string
+      city:
+        type: string
+      zipcode:
+        type: string
+      tel1:
+        type: string
+      tel2:
+        type: string
+      mobile:
+        type: string
+      fax:
+        type: string
+      ips:
+        type: array
+        items:
+          type: string
+    description: User creation model
+    required:
+      - username
+      - role
+      - password
+
+  GeoStateDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Unique id
+      countryCode:
+        type: string
+        description: Country Code
+      statecode:
+        type: string
+        description: State Code
+      name:
+        type: string
+        description: State name
+
+  GeoLataDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Unique id
+      countryCode:
+        type: string
+        description: Country Code
+      statecode:
+        type: string
+        description: State Code
+      name:
+        type: string
+        description: State name
+      lataCode:
+        type: string
+        description: LATA Code
+      carrierCode:
+        type: string
+        description: Carrier Code
+  
+  smsConnectionsResponse:
+    type: array
+    items:
+      $ref: '#/definitions/SMSConnectionDTO'
+
+  SMSConnectionDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Unique object id
+      remoteAddr:
+        type: string
+        description: SMS Application Server address
+      port:
+        type: integer
+        description: Connection port
+      srcNodeName:
+        type: string
+        description: Source Node Name
+      destNodeName:
+        type: string
+        description: Destination Node Name
+      active:
+        type: boolean
+        description: Status of connection
+        default: true
+    required:
+      - id
+      - remoteAddr
+      - port
+      - srcNodeName
+      - destNodeName
+
+  SmsIDInfoDTO:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Allocated SOMOS ID
+      ro:
+        type: string
+        description: RespOrgId
+    required:
+      - id
+      - ro
+      
+  UploadLergResponse:
+    type: object
+    properties:
+      message: 
+        type: string
+      filename: 
+        type: string
+      columns:
+        type: array
+        description: >
+          Read Column Names.
+        items: 
+          type: string
+        
+  UploadRateResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      filename:
+        type: string
+      columns:
+        type: array
+        description: >
+          Read Column Names.
+        items:
+          type: string
+          
+  UploadCDRResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      filename:
+        type: string
+      columns:
+        type: array
+        description: >
+          Read Column Names.
+        items:
+          type: string
+  
+  InsertLergRequest:
+    type: object
+    properties:
+      filename:
+        type: string
+      delimiter:
+        type: string
+        enum: [comma, pipe, tab, semicolon]
+        description: >-
+          CSV file column delimiter
+            * comma - **","**
+            * pipe - **"|"**
+            * tab - **"/t"**
+            * semicolon - **";"**
+      insertType:
+        type: string
+        enum: [update, overwrite]
+        description: >-
+          Inser type
+            * overwite - Delete and Upload
+            * update - Upload
+      hasColumnHeader:
+        type: boolean
+        description: csv file has column header or not
+      state:
+        type: integer
+        description: Column index of state
+      npa:
+        type: integer
+        description: npa column index
+      lata:
+        type: integer
+        description: lata column index
+      nxx:
+        type: integer
+        description: nxx column index
+      x:
+        type: integer
+        description: colum index of x of npa-nxx-x
+      carrier:
+        type: integer
+        description: column index of carrier
+      acna:
+        type: integer
+        description: column index of acna
+      cic:
+        type: integer
+        description: column index of cic
+        
+    required:
+      - filename
+      - delimiter
+      
+  InsertRateRequest:
+    type: object
+    properties:
+      filename:
+        type: string
+      delimiter:
+        type: string
+        enum: [comma, pipe, tab, semicolon]
+        description: >-
+          CSV file column delimiter
+            * comma - **","**
+            * pipe - **"|"**
+            * tab - **"/t"**
+            * semicolon - **";"**
+      hasColumnHeader:
+        type: boolean
+        description: csv file has column header or not
+      rate_name:
+        type: string
+        description: Rate name
+      carrier_name:
+        type: string
+        description: carrier name
+      init_duration:
+        type: string
+        description: initial duration
+      increment_duration:
+        type: string
+        description: increment duration
+      lata:
+        type: integer
+        description: lata column index
+      npa:
+        type: integer
+        description: npa column index
+      nxx:
+        type: integer
+        description: nxx column index
+      npanxx:
+        type: integer
+        description: npanxx column index
+      ocn:
+        type: integer
+        description: column index of ocn
+      inter_rate:
+        type: integer
+        description: column index of interstate rate
+      intra_rate:
+        type: integer
+        description: column index of intrastate rate
+      country_code:
+        type: integer
+        description: country code
+      eff_date:
+        type: string
+        description: effective date
+        
+    required:
+      - filename
+      - delimiter
+      
+  InsertCDRRequest:
+    type: object
+    properties:
+      filename:
+        type: string
+      delimiter:
+        type: string
+        enum: [comma, pipe, tab, semicolon]
+        description: >-
+          CSV file column delimiter
+            * comma - **","**
+            * pipe - **"|"**
+            * tab - **"/t"**
+            * semicolon - **";"**
+      insertType:
+        type: string
+        enum: [overwrite, append]
+        description: >-
+          Inser type
+            * overwite - Delete
+            * append - Append
+      hasColumnHeader:
+        type: boolean
+        description: csv file has column header or not
+      row_ani:
+        type: integer
+        description: Row ANI column index 
+      duration:
+        type: integer
+        description: duration column index
+      cost:
+        type: integer
+        description: cost column index
+      rate:
+        type: integer
+        description: rate column index
+      lrn:
+        type: integer
+        description: lrn column index
+      durationUnit:
+        type: string
+        enum: ['minute', 'second']
+        
+    required:
+      - filename
+      - delimiter
+      
+  LCRReportRequest:
+    type: object
+    properties:
+      rateNames:
+        type: array
+        items:
+          type: string
+      name:
+        type: string
+    required:
+      - rateNames
+      - name
+  
+  LataNpanxxReport2Request:
+    type: object
+    properties:
+      rateNames:
+        type: array
+        description: rate decks to compare
+        items:
+          type: string
+          description: name of rate deck
+      name: 
+        type: string
+        description: name of new report
+        
+  RateDeckDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Rate Deck Id
+      name:
+        type: string
+        description: Rate Deck Name
+      carrier:
+        type: string
+        description: Carrier Name
+        
+  LcrReportDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: LCR Report Id
+      name:
+        type: string
+        description: LCR Report name
+        
+  LataNpanxxReport2DTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: LataNpanxxReport2 Id
+      name:
+        type: string
+        description: LataNpanxxReport2 name
+        
+  CreateCprReportRequest:
+    type: object
+    properties:
+      lcrReportId:
+        type: integer
+        format: int64
+        description: LCR Report ID to refer
+      name:
+        type: string
+      defaultRate:
+        type: number
+        format: float
+        
+  CprReportSummary:
+    type: object
+    properties:
+      totalCost:
+        type: number
+        format: double
+      averageRate:
+        type: number
+        format: float
+      defaultCarrier:
+        type: string
+      defaultCarrierNpaNxx:
+        type: string
+        
+  TableQuery:
+    type: object
+    properties:
+      page:
+        type: integer
+        format: int64
+        description: 0 based page number
+      pageSize:
+        type: integer
+        format: int64
+        description: page size
+      sorts:
+        type: array
+        items:
+          $ref: '#/definitions/SortOption'
+        description: >-
+          Sort options array
+      filters:
+        type: array
+        items:
+          $ref: '#/definitions/FilterOption'
+        description: >-
+          Filter Keys
+      search:
+        type: string
+        description: Search parameter
+      searchColumns:
+        type: array
+        items:
+          type: string
+    required:
+      - page
+      - pageSize
+
+  SortOption:
+    type: object
+    properties:
+      column:
+        type: string
+        description: 'Sort column name'
+      direction:
+        type: string
+        enum: ['asc', 'desc']
+        default: 'asc'
+        description: Sort direction
+    required:
+      - column
+    description: Sort option
+
+  FilterOption:
+    type: object
+    properties:
+      column:
+        type: string
+        description: 'Filtered column name'
+      contains:
+        type: string
+        description: 'Keyword'
+      exact:
+        type: string
+        description: 'Set this value if need to find exact value'
+      from:
+        type: string
+        description: 'Between start, used for range search or date from-to'
+      to:
+        type: string
+        description: 'Between end, used for range search or date from-to'
+      
+    required:
+      - column
+
+  TableResult:
+    type: object
+    properties:
+      rows:
+        type: array
+        items:
+          type: object
+      query:
+        $ref: '#/definitions/TableQuery'
+      totalCount:
+        type: integer
+        format: int64
+        description: Total Item Count
+      totalFilteredCount:
+        type: integer
+        format: int64
+        description: Filtered Count (Via search conditions)
+      totalPages:
+        type: integer
+        format: int64
+        description: Page count of filtered items
+    required:
+      - totalPages
+      - totalCount
+      - rows
+      - query
+
+  CreateResult:
+    type: object
+    description: Create object result, for 201 status code
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Newly created object id

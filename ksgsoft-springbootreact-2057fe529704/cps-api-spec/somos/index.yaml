@@ -1,0 +1,817 @@
+swagger: '2.0'
+info:
+  version: 'v1'
+  title: 'CPS Somos Module REST API'
+
+host: 'localhost:8083'
+basePath: '/api/v1'
+
+schemes:
+  - https
+  - http
+
+consumes:
+  - application/x-www-form-urlencoded
+
+produces:
+  - application/json
+
+# Tags definition
+tags:
+  - name: Session
+    description: 'Session Management API'
+  - name: Somos
+    description: 'Somos Request API'
+  - name: Connections
+    description: 'Connections Manage API. These apis are only allowed to called by localhost'
+
+responses:
+  '202':
+    description: 'Request Accepted'
+    schema:
+      $ref: '#/definitions/TimeoutResponse'
+
+parameters:
+  authHeader:
+    name: Authorization
+    in: header
+    description: Bearer access_token
+    type: string
+    required: true
+    
+  id:
+    name: id
+    in: path
+    description: id of Object
+    type: integer
+    format: int64
+    required: true
+  
+  tableQuery:
+    name: body
+    in: body
+    description: table query
+    schema:
+      $ref: '#/definitions/TableQuery'
+    required: true
+    
+  verb:
+    name: verb
+    in: formData
+    description: 'Verb of MGI Command. For Example **REQ**'
+    required: true
+    type: string
+  
+  mod:
+    name: mod
+    in: formData
+    description: 'Mod of MGI Command. For Example **NSR** for Number Search, Reserve'
+    required: true
+    type: string
+    
+  message:
+    name: message
+    in: formData
+    description: >-
+      Message block content of command.  e.g
+        `
+        :ID=XXXXX101,RO=XXXX1:QT=3:NUML="8007671111,8887671112,8887671113"
+        `
+      This does not include semicolon (;) at the end.
+    required: true
+    type: string
+    
+  timeout:
+    name: timeout
+    in: formData
+    description: 'Timeout for this request'
+    type: integer
+    default: 20
+    
+
+paths:
+  /session/login:
+    post:
+      tags:
+        - Session
+      summary: 'Login get access token & refresh token'
+      operationId: login
+      description: >-
+        This api will call authorization server's oauth/token with client id and client secret key which are assigned for the cps backend.
+        This api will send response from authorization server as response of this api excepting client id and client secret.
+        Returned token is JWT token
+      consumes: 
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/LoginRequest'
+          required: true
+      responses:
+        '200':
+          description: 'Login Success. Returns refresh token'
+          schema:
+            $ref: '#/definitions/LoginResponse'
+
+  /session/refresh:
+    post:
+      tags:
+        - Session
+      summary: 'Refresh Token'
+      operationId: refreshToken
+      description: >-
+        This api will call authorization server's oauth/token with client id and client secret key which are assigned for the cps backend and refresh the JWT token
+      consumes: 
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/TokenRefreshRequest'
+          required: true
+      responses:
+        '200':
+          description: 'Refresh token succeed'
+          schema:
+            $ref: '#/definitions/TokenRefreshResponse'
+  
+            
+  /somos/send:
+    post:
+      tags:
+        - Somos
+      summary: 'Send SOMOS MGI Request'
+      operationId: sendRequest
+      consumes:
+        - 'application/x-www-form-urlencoded'
+      description: >-
+        This api will send somos mgi request to server
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/verb'
+        - $ref: '#/parameters/mod'
+        - $ref: '#/parameters/message'
+        - $ref: '#/parameters/timeout'
+      responses:
+        '200':
+          description: >-
+            Response from SOMOS server.
+          schema:
+            $ref: '#/definitions/SomosResponse'
+        '202':
+          $ref: '#/responses/202'
+        '401':
+          description: Bad Request. Message is not correctly formated or ID, RO mismatching
+  
+  /somos/send_new:
+    post:
+      tags:
+        - Somos
+      summary: 'Send SOMOS MGI Request'
+      operationId: sendRequestNew
+      consumes:
+        - 'application/x-www-form-urlencoded'
+      description: >-
+        This api will send somos mgi request to server
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/verb'
+        - $ref: '#/parameters/mod'
+        - $ref: '#/parameters/message'
+        - $ref: '#/parameters/timeout'
+      responses:
+        '200':
+          description: >-
+            Response from SOMOS server.
+          schema:
+            $ref: '#/definitions/SomosResponseNew'
+        '202':
+          $ref: '#/responses/202'
+          
+        '401':
+          description: Bad Request. Message is not correctly formated or ID, RO mismatching
+  
+  
+  '/somos/retrieve/{id}':
+    get:
+      tags:
+        - Somos
+      summary: 'Retrieve request result by request id'
+      operationId: retrieveRequestResultById
+      description: >- 
+        Used to poll timed out response. 
+        id is requestId retrieved from timeout Response
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: >-
+            Response from SOMOS server
+          schema:
+            $ref: '#/definitions/SomosResponse'
+        '404':
+          description: 'Response not arrived yet'
+          
+  '/somos/retrieve_new/{id}':
+    get:
+      tags:
+        - Somos
+      summary: 'Retrieve request result by request id'
+      operationId: retrieveRequestResultByIdNew
+      description: >- 
+        Used to poll timed out response. 
+        id is requestId retrieved from timeout Response
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: >-
+            Response from SOMOS server
+          schema:
+            $ref: '#/definitions/SomosResponseNew'
+        '404':
+          description: 'Response not arrived yet'
+  
+  '/somos/reserved_numbers':
+    post:
+      tags:
+        - Somos
+      summary: Get reserved numbers history
+      operationId: getReservedNumbers
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/tableQuery'
+      responses:
+        '200':
+          description: success
+          schema:
+            $ref: '#/definitions/TableResult'
+            
+  '/somos/send_standalone':
+    post:
+      tags:
+        - Somos
+      summary: 'Send SOMOS MGI Request'
+      operationId: sendRequestStandalone
+      consumes:
+        - 'application/x-www-form-urlencoded'
+      description: >-
+        This api is used by standalone app
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/verb'
+        - $ref: '#/parameters/mod'
+        - $ref: '#/parameters/message'
+        - $ref: '#/parameters/timeout'
+      responses:
+        '200':
+          description: >-
+            Response from SOMOS server.
+          schema:
+            $ref: '#/definitions/SomosResponseStandalone'
+        '401':
+          description: Bad Request. Message is not correctly formated or ID, RO mismatching
+  
+  '/somos/retrieve_standalone/{id}':
+    get:
+      tags:
+        - Somos
+      summary: 'Retrieve request result by request id'
+      operationId: retrieveRequestResultByIdStandalone
+      description: >- 
+        Used to poll timed out response. 
+        id is requestId retrieved from timeout Response
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: >-
+            Response from SOMOS server
+          schema:
+            $ref: '#/definitions/SomosResponseStandalone'
+  
+  '/somos/volume_test':
+    post:
+      tags:
+        - Somos
+      summary: 'Perform a volume test'
+      operationId: volumeTest
+      description: >-
+        Reactive api
+      parameters:
+        - $ref: '#/parameters/authHeader'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/VolumeTestRequest'
+      responses:
+        '200':
+          description: 'Reactive response'
+  
+  '/connections/start':
+    get:
+      tags:
+        - Connections
+      description: >
+        This will only be called from 127.0.0.1 by admin module
+      summary: Start somos connections
+      operationId: startConnections
+      responses:
+        '200':
+          description: Started connections
+
+  '/connections/stop':
+    get:
+      tags:
+        - Connections
+      description: >
+        This will only be called from 127.0.0.1 by admin module
+      summary: Stop somos connections
+      operationId: stopConnections
+      responses:
+        '200':
+          description: Stopped connections
+          
+  '/connections/restart':
+    get:
+      tags:
+        - Connections
+      description: >
+        This will only be called from 127.0.0.1 by admin module
+      summary: Restart somos connections
+      operationId: restartConnections
+      responses:
+        '200':
+          description: Restarted connections
+  
+  # '/connections/{id}/start':
+  #   get:
+  #     tags:
+  #       - Connections
+  #     description: >-
+  #       This api will be called by cps-admin module.
+  #       Only allowed from localhost.
+  #       This can be called when admin user activates a somos connection
+  #     summary: Start a somos connection with id
+  #     operationId: startConnectionById
+  #     parameters:
+  #       - $ref: '#/parameters/id'
+  #     responses:
+  #       '200':
+  #         description: Started connection
+  
+  # '/connections/{id}/stop':
+  #   get:
+  #     tags:
+  #       - Connections
+  #     description: >-
+  #       This api will be called by cps-admin module.
+  #       Only allowed from localhost.
+  #       This can be called when admin user deactivates somos connection
+  #     summary: Stop a somos connection with id
+  #     operationId: stopConnectionById
+  #     parameters:
+  #       - $ref: '#/parameters/id'
+  #     responses:
+  #       '200':
+  #         description: Stopped connection
+          
+  # '/connections/running':
+  #   get:
+  #     tags:
+  #       - Connections
+  #     description: >-
+  #       This api will be called by cps-admin module.
+  #       Only allowed from localhost.
+  #       Returns running connection ids
+  #     summary: Get running somos connections
+  #     operationId: getRunningConnections
+  #     responses:
+  #       '200':
+  #         description: Array of running connection ids
+  #         schema:
+  #           type: array
+  #           items:
+  #             type: integer
+  #             format: int64
+  
+      
+definitions:
+  TimeoutResponse:
+    type: object
+    properties:
+      requestId:
+        type: integer
+        format: int64
+        description: 'Request timed out. Please try again with request id.'
+      
+  LoginRequest:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+    required:
+      - username
+      - password
+
+  LoginResponse:
+    type: object
+    properties:
+      oauthToken:
+        description: >-
+          This token is valid for 60 mins. and should be passed as
+          'Authorization: Bearer oauthToken' header when invoking the APIs
+          This will be JWT.
+        type: string
+      refreshToken:
+        type: string
+        example: ab2603d1-c067-383e-adc9-51217043cc92
+        description: >-
+          This token is valid for 24hrs. and should be used for obtaining a new
+          token using the OAuth 2.0 refresh_grant flow.
+      scope:
+        type: string
+        example: default
+        description: This value is always 'default'
+      expiresIn:
+        type: integer
+        example: 3600
+        description: Number of seconds the token is valid.
+      privileges:
+        type: array
+        items:
+          type: string
+        description: Granted privileges for user
+      profile:
+        $ref: '#/definitions/LoginProfile'
+  
+  LoginProfile:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: user id
+      username:
+        type: string
+        description: user name
+      firstName:
+        type: string
+        description: First Name
+      lastName:
+        type: string
+        description: Last Name
+      roles:
+        type: array
+        items:
+          $ref: '#/definitions/LoginRole'
+        description: Available roles for this user
+      somos:
+        $ref: '#/definitions/SomosCredential'
+        
+  LoginRole:
+    type: object
+    properties:
+      id: 
+        type: integer
+        format: int64
+        description: role id
+      name: 
+        type: string
+        description: role name
+        
+  SomosCredential:
+    type: object
+    properties:
+      id:
+        type: string
+      ro:
+        type: string
+
+  TokenRefreshRequest:
+    type: object
+    properties:
+      refreshToken:
+        type: string
+        description: >-
+          Refresh Token
+    required:
+      - refreshToken
+
+  TokenRefreshResponse:
+    type: object
+    properties:
+      oauthToken:
+        description: >-
+          This token is valid for 60 mins. and should be passed as
+          'Authorization: Bearer oauthToken' header when invoking the APIs
+          This will be JWT.
+        type: string
+      refreshToken:
+        type: string
+        example: ab2603d1-c067-383e-adc9-51217043cc92
+        description: >-
+          This token is valid for 24hrs. and should be used for obtaining a new
+          token using the OAuth 2.0 refresh_grant flow.
+      scope:
+        type: string
+        example: default
+        description: This value is always 'default'
+      expiresIn:
+        type: integer
+        example: 3600
+        description: Number of seconds the token is valid.
+        
+  SomosResponse:
+    type: object
+    description: SOMOS Response from server
+    properties:
+      requestId:
+        type: integer
+        format: int64
+        description: Request Id of request
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/SomosMessage'
+  
+  SomosMessage:
+    type: object
+    description: Response MGI Message from SOMOS server
+    properties:
+      routeId:
+        description: RouteId of message
+        type: string
+        example: 'DRC'
+      termrpt:
+        description: Status TermRpt of Message
+        type: string
+      errorCode:
+        description: Error Code of Message
+        type: string
+      params:
+        description: >-
+          String representation of data block that is separated with new line (\n)
+          
+          e.g. A Simple Number Search & Reserve Response
+          
+          ```
+            ID=XQG01000
+            RO=XQG01
+            CNT=1
+            NUM=8336106373
+          ```
+          
+        type: string
+        
+  SomosResponseNew:
+    type: object
+    description: Response MGI Message from SOMOS server
+    properties:
+      requestId:
+        type: integer
+        format: int64
+        description: Request Id of request
+      message:
+        type: string
+        description: >-
+        
+          String representation of response message
+          
+          ```
+              RSP-NSC:,2003-03-28,12-02-01-CST:::COMPLD,00::ID=XXXXX101,RO=XXXX1:QT=00000012:NUML="8005601111,8005601112,8005601113,8005601114,8005601115,8005601116,8005601117,8005601118,8005601119,8005601120,8005601121,8005601122";
+          ```
+  
+  NumberInfoDTO:
+    type: object
+    description: >-
+      Describes number status to update
+    properties:
+      num:
+        type: string
+        pattern: '^[a-zA-Z0-9]{10}$'
+      status:
+        $ref: '#/definitions/numberStatus'
+      
+  numberStatus:
+    type: object
+    enum:
+      - SPARE
+      - UNAVAIL
+      - RESERVE
+      - ASSIGNE
+      - SUSPEND
+      - WORKING
+      - DISCONN
+      - TRANSIT
+  
+  TableQuery:
+    type: object
+    properties:
+      page:
+        type: integer
+        format: int64
+        description: 0 based page number
+      pageSize:
+        type: integer
+        format: int64
+        description: page size
+      sorts:
+        type: array
+        items:
+          $ref: '#/definitions/SortOption'
+        description: >-
+          Sort options array
+      filters:
+        type: array
+        items:
+          $ref: '#/definitions/FilterOption'
+        description: >-
+          Filter Keys
+      search:
+        type: string
+        description: Search parameter
+      searchColumns:
+        type: array
+        items:
+          type: string
+    required:
+      - page
+      - pageSize
+
+  SortOption:
+    type: object
+    properties:
+      column:
+        type: string
+        description: 'Sort column name'
+      direction:
+        type: string
+        enum: ['asc', 'desc']
+        default: 'asc'
+        description: Sort direction
+    required:
+      - column
+    description: Sort option
+
+  FilterOption:
+    type: object
+    properties:
+      column:
+        type: string
+        description: 'Filtered column name'
+      contains:
+        type: string
+        description: 'Keyword'
+      exact:
+        type: string
+        description: 'Set this value if need to find exact value'
+      
+    required:
+      - column
+      - search
+
+  TableResult:
+    type: object
+    properties:
+      rows:
+        type: array
+        items:
+          type: object
+      query:
+        $ref: '#/definitions/TableQuery'
+      totalCount:
+        type: integer
+        format: int64
+        description: Total Item Count
+      totalFilteredCount:
+        type: integer
+        format: int64
+        description: Filtered Count (Via search conditions)
+      totalPages:
+        type: integer
+        format: int64
+        description: Page count of filtered items
+    required:
+      - totalPages
+      - totalCount
+      - rows
+      - query
+  
+  SomosResponseStandalone:
+    type: object
+    description: Assumed incompleted request if received is set to null
+    properties:
+      requestId:
+        type: integer
+        format: int64
+      sent:
+        $ref: '#/definitions/DcmMessageDTO'
+      received:
+        $ref: '#/definitions/DcmMessageDTO'
+          
+  DcmMessageDTO:
+    type: object
+    properties:
+      transportHeader:
+        $ref: '#/definitions/SMSTransportHeaderDTO'
+      uplHeader:
+        $ref: '#/definitions/UPLHeaderDTO'
+      upl:
+        type: string
+        description: "UPL Data string"
+  
+  SMSTransportHeaderDTO:
+    type: object
+    properties:
+      version:
+        type: integer
+      priority:
+        type: integer
+      messageId:
+        type: string
+      destNodeName:
+        type: string
+      srcNodeName:
+        type: string
+      errorCode:
+        type: integer
+      messageCode:
+        type: integer
+        
+  UPLHeaderDTO:
+    type: object
+    properties:
+      confirmationFlag:
+        type: integer
+      correlationID:
+        type: string
+      srcNodeName:
+        type: string
+      DRC:
+        type: string
+      errorCode:
+        type: integer
+        
+  VolumeTestRequest:
+    type: object
+    properties:
+      volume:
+        type: string
+        enum: [75, 130, 195, 260, 325, 390, 455, 520, 585, 650]
+        description: Volume test load
+      id:
+        type: string
+        description: ID
+      ro:
+        type: string
+        description: MainRespOrgId
+      nums:
+        type: array
+        items:
+          type: string
+        description: >-
+          Numbers to be tested. Prefer to be reserved numbers.
+      notes:
+        type: array
+        items:
+          type: string
+        description: >-
+          Notes descriptions. As many as possible
+      ros:
+        type: array
+        items:
+          type: string
+        description: >-
+          RespOrgs
+      conTels:
+        type: array
+        items:
+          $ref: '#/definitions/VolumeTestConTel'
+    required:
+      - volume
+      - id
+      - ro
+      - conTels
+          
+  VolumeTestConTel:
+    type: object
+    properties:
+      con:
+        type: string
+        description: >-
+          Contact name
+      tel:
+        type: string
+        description: >-
+          Telephone number
+    required:
+      - con
+      - tel

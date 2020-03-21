@@ -1,5 +1,4 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-// import { TableData } from './table-data';
 import {AuthService} from '../../../../core/auth/_services';
 import {FormBuilder, FormGroup} from '@angular/forms';
 
@@ -9,17 +8,10 @@ import {FormBuilder, FormGroup} from '@angular/forms';
   styleUrls: ['./customers.component.scss']
 })
 
-
 export class CustomersComponent implements OnInit {
 
 	public rows:Array<any> = [];
-	public columns:Array<any> = [
-		{title: 'Title', name: 'name', filtering: {filterString: '', placeholder: 'Filter by title'}},
-		{title: 'Type', name: 'address', sort: '', filtering: {filterString: '', placeholder: 'Filter by type'}},
-		{title: 'Create Date', name: 'email', sort: 'asc', filtering: {filterString: '', placeholder: 'Filter by email'}, className: ['email', 'text-success']},
-		{title: 'Sale Date.', name: 'createdate', sort: '', filtering: {filterString: '', placeholder: 'Filter by birthday'}},
-		{title: 'Number', className: 'text-warning', name: 'phone_number', filtering: {filterString: '', placeholder: 'Filter by phone number'}},
-	];
+	public columns:Array<any> = [];
 	public page:number = 1;
 	public itemsPerPage:number = 10;
 	public maxSize:number = 5;
@@ -33,7 +25,7 @@ export class CustomersComponent implements OnInit {
 		className: ['table-striped', 'table-bordered']
 	};
 
-	private data:CustomerData[] = [];
+	public data = [];
 
 	// Start Date and End Date Validation
 	unavailability = { startDate:"", endDate: "" };
@@ -41,8 +33,8 @@ export class CustomersComponent implements OnInit {
 	constructor(
 		private getUserService: AuthService,
 		private formBuilder: FormBuilder,
-		private ref: ChangeDetectorRef
-	) {
+		private ref: ChangeDetectorRef)
+	{
 		// Pagination Definition.
 		this.length = this.data.length;
 		// Start Date and End Date Validation
@@ -60,15 +52,26 @@ export class CustomersComponent implements OnInit {
 		this.refreshToken = localStorage.getItem('refreshToken');
 
 		this.getUserService.getCustomerData(this.oauthToken).subscribe( result => {
-			Object.keys(result['customers']).forEach((item) => {
-				this.data.push(result['customers'][item])
+			let columns = [];
+			let i = 0;
+			Object.keys(result['rows'][0][0]).forEach(item => {
+				let temp = {};
+				temp['title'] = item.toLocaleUpperCase();
+				temp['name'] = item;
+				temp['sort'] = '';
+				temp['sort'] = '';
+				if(i > 0 && i < 5) {
+					temp['filtering'] = {'filterString':'', 'placeholder': 'By ' + item.toLocaleLowerCase()};
+				}
+				i ++;
+				columns.push(temp)
 			});
+			this.columns = columns;
+
+			// Draw Body
+			this.data = result['rows'][0];
 			this.onChangeTable(this.config);
-		}, error => {
-			console.log('customer error--', error)
 		});
-
-
 	}
 
 	public changePage(page:any, data:Array<any> = this.data):Array<any> {
@@ -185,29 +188,18 @@ export class CustomersComponent implements OnInit {
 		start_date = start_date ? start_date.toLocaleString() : '';
 		let end_date = this.unavailabilityForm.controls.endDate.value;
 		end_date = end_date ? end_date.toLocaleString() : '';
-		console.log('_-_-_-_', start_date, end_date);
-
 		start_date = this._getDateString(start_date);
 		end_date = this._getDateString(end_date);
-		console.log('_-_-_-_', start_date, end_date.length);
+		if (start_date === '') start_date = '0000-00-00';
+		if (end_date === '') end_date = '9999-12-31';
 
 		let search = {'oauth': this.oauthToken, 'sDate': start_date, 'eDate': end_date};
+		console.log(search);
 		this.getUserService.customerSearch(search).subscribe(result => {
-			this.data = [];
-			Object.keys(result['customers']).forEach((item) => {
-				this.data.push(result['customers'][item]);
-			});
+			this.data = result['rows'][0];
 			this.onChangeTable(this.config);
 			this.ref.detectChanges();
 		});
 
 	}
-}
-
-export interface CustomerData {
-	'name': string,
-	'address': string,
-	'email': string,
-	'createdate': string,
-	'phone_number': string,
 }

@@ -43,13 +43,7 @@ export interface LayoutConfigModel {
 			self?: {
 				width?: string;
 			}
-			search?: {
-				display: boolean;
-				layout: 'offcanvas' | 'dropdown';
-				dropdown?: {
-					style: 'light' | 'dark';
-				}
-			};
+
 			notifications?: {
 				display: boolean;
 				layout: 'offcanvas' | 'dropdown';
@@ -77,10 +71,6 @@ export interface LayoutConfigModel {
 			cart?: {
 				display: boolean
 			};
-			'my-cart'?: any
-			'quick-panel'?: {
-				display: boolean
-			}
 		};
 		search?: {
 			display: boolean
@@ -148,21 +138,8 @@ export interface LayoutConfigModel {
 			expanded?: boolean;
 		}
 	};
-	subheader?: {
-		display: boolean;
-		fixed?: boolean;
-		width?: string;
-		layout?: string;
-		style?: 'light' | 'solid' | 'transparent';
-		daterangepicker?: {
-			display: boolean
-		}
-	};
 	content?: any;
 	footer?: {
 		self?: any;
-	};
-	'quick-panel'?: {
-		display?: boolean
 	};
 }

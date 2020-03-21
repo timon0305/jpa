@@ -24,9 +24,7 @@ import { InlineSVGModule } from 'ng-inline-svg';
 // Core Module
 import { CoreModule } from '../../core/core.module';
 import { HeaderComponent } from './header/header.component';
-import { AsideLeftComponent } from './aside/aside-left.component';
 import { FooterComponent } from './footer/footer.component';
-import { SubheaderComponent } from './subheader/subheader.component';
 import { BrandComponent } from './brand/brand.component';
 import { TopbarComponent } from './header/topbar/topbar.component';
 import { MenuHorizontalComponent } from './header/menu-horizontal/menu-horizontal.component';
@@ -35,7 +33,6 @@ import { BaseComponent } from './base/base.component';
 import { PagesModule } from '../pages/pages.module';
 import { HtmlClassService } from './html-class.service';
 import { HeaderMobileComponent } from './header/header-mobile/header-mobile.component';
-import { ErrorPageComponent } from './content/error-page/error-page.component';
 import { PermissionEffects, permissionsReducer, RoleEffects, rolesReducer } from '../../core/auth';
 
 @NgModule({
@@ -48,19 +45,12 @@ import { PermissionEffects, permissionsReducer, RoleEffects, rolesReducer } from
 		BrandComponent,
 		HeaderMobileComponent,
 
-		// subheader
-		SubheaderComponent,
-
 		// topbar components
 		TopbarComponent,
-
-		// aside left menu components
-		AsideLeftComponent,
 
 		// horizontal menu components
 		MenuHorizontalComponent,
 
-		ErrorPageComponent,
 	],
 	exports: [
 		BaseComponent,
@@ -71,19 +61,13 @@ import { PermissionEffects, permissionsReducer, RoleEffects, rolesReducer } from
 		BrandComponent,
 		HeaderMobileComponent,
 
-		// subheader
-		SubheaderComponent,
-
 		// topbar components
 		TopbarComponent,
 
-		// aside left menu components
-		AsideLeftComponent,
 
 		// horizontal menu components
 		MenuHorizontalComponent,
 
-		ErrorPageComponent,
 	],
 	providers: [
 		HtmlClassService,

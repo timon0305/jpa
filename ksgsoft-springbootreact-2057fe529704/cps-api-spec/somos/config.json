@@ -1,0 +1,8 @@
+{
+    "groupId": "com.digitalipvoice.cps.client",
+    "artifactId": "somos",
+    "artifactVersion": "1.0.0",
+    "modelPackage": "com.digitalipvoice.cps.client.somos.models",
+    "apiPackage": "com.digitalipvoice.cps.client.somos.api",
+    "java8": true
+}

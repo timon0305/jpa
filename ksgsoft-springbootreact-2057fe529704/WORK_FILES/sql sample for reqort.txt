@@ -1,0 +1,143 @@
+SELECT * FROM rate_import
+INNER JOIN rate_import r_att
+INNER JOIN rate_import r_cic
+
+
+INNER JOIN (SELECT cic, MIN(intraRate) from rate_import WHERE cic in (acc, bbb) GROUP BY npanxx) mintable ON 
+
+SELECT npanxx, cic, MIN(intraRate) from rate_test WHERE cic in ('ATT', 'CTX') GROUP BY npanxx
+
+SELECT r.npanxx, r.cic, r.inter_rate FROM rate_test r JOIN (SELECT MIN(inter_rate) AS inter_rate FROM rate_test WHERE cic in ('ATT','CTX') GROUP BY npanxx) min ON r.inter_rate=min.inter_rate
+
+
+CREATE TABLE IF NOT EXISTS rate_report_2019_05_13(
+	npanxx int UNIQUE,
+	cic varchar(3),
+	rate float
+);
+
+INSERT INTO rate_report_2019_05_13 
+	SELECT r.npanxx, r.cic, r.inter_rate FROM rate_test r 
+		JOIN (SELECT MIN(inter_rate) AS inter_rate FROM rate_test 
+			WHERE cic in ('ATT','CTX') 
+				GROUP BY npanxx) min ON r.inter_rate=min.inter_rate
+
+
+
+INSERT INTO rate_report_data (npanxx, carrier_name, inter_rate) 
+	SELECT baseData.npanxx, baseData.carrier_name, baseData.inter_rate FROM rate_deck baseData 
+    	JOIN (SELECT MIN(inter_rate) AS inter_rate FROM rate_deck WHERE carrier_name IN ('ATT','TST') GROUP BY npanxx) 
+        	min ON baseData.inter_rate=min.inter_rate;
+
+CREATE TABLE IF NOT EXISTS rate_report_2019_05_13(
+	npanxx int UNIQUE,
+	carrier_name varchar(3),
+	rate float
+);
+
+INSERT INTO rate_report_2019_05_13 
+	SELECT baseData.npanxx, baseData.carrier_name, baseData.inter_rate FROM rate_deck baseData 
+    	JOIN (SELECT MIN(inter_rate) AS inter_rate FROM rate_deck WHERE carrier_name IN ('ATT','TST') GROUP BY npanxx) 
+        	min ON baseData.inter_rate=min.inter_rate;
+
+
+
+CREATE TABLE IF NOT EXISTS report_test (npanxx INT(10), min_carrier VARCHAR(3), min_rate FLOAT, INDEX (npanxx));
+
+INSERT INTO report_test SELECT baseData.npanxx, baseData.carrier_name, baseData.inter_rate FROM rate_deck baseData JOIN (SELECT MIN(inter_rate) AS inter_rate FROM rate_deck WHERE carrier_name IN ('ATT','TST') GROUP BY npanxx) min ON baseData.inter_rate=min.inter_rate
+
+
+CREATE TABLE report_test1 (
+    npanxx int(10),
+    min_carrier varchar(3),
+    min_rate float,
+    index(npanxx)
+    );
+    
+INSERT INTO report_test1 
+	SELECT 
+    	r_att.npanxx, 
+		(CASE
+		 	WHEN LEAST(r_att.inter_rate, r_tst.inter_rate) = r_att.inter_rate THEN 'ATT'
+		 	WHEN LEAST(r_att.inter_rate, r_tst.inter_rate) = r_tst.inter_rate THEN 'TST'
+		 	ELSE 'UNKNOWN'
+		End) as min_carrier,
+    	LEAST(r_att.inter_rate, r_tst.inter_rate) as min_rate,
+		17012 as report_id
+	FROM rate_deck r_att
+		LEFT JOIN rate_deck r_tst ON r_att.npanxx = r_tst.npanxx
+		
+	WHERE 
+		r_att.user_id = 45 AND r_att.carrier_name = 'ATT' AND 
+		r_tst.user_id = 45 AND r_tst.carrier_name = 'TST'
+
+		
+SELECT npanxx 
+FROM (
+    SELECT rd.npanxx, lg.npa_nxx
+	FROM rate_deck_data rd RIGHT JOIN lerg_import lg
+	ON rd.npanxx = lg.npa_nxx
+	WHERE lg.npa_nxx = lg.npa_nxxx
+) result
+WHERE result.npanxx NOT IN (SELECT npanxx FROM rate_deck_data)
+    ;
+		
+		
+SELECT lg.npa_nxx 
+FROM rate_deck_data rd
+LEFT JOIN lerg_import lg 
+ON rd.npanxx = lg.npa_nxx
+WHERE lg.npa_nxx = NULL
+GROUP BY rd.npanxx;
+		
+		
+// Fill lrn data from lrn_data to cdr_data
+INSERT INTO cdr_data cdr.lrn VALUES (SELECT lrn.did FROM cdr_data cdr LEFT JOIN lrn_data lrn ON cdr.row_ani = lrn.did);
+		
+		
+		
+		
+		
+		
+
+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
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+http://208.76.97.21:81
+
+alexchan0816 / tbvj@bit.0816-2018
+
+https://bitbucket.org/tollx2018/cps-admin-frontend
+https://bitbucket.org/tollx2018/cps-customer-frontend
+https://bitbucket.org/tollx2018/cps-api-spec
+https://bitbucket.org/tollx2018/document
+https://bitbucket.org/tollx2018/cps-backend

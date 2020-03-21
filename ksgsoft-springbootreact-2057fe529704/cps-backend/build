@@ -1,0 +1,21 @@
+# Build script
+# first parameter is module name (auth/somos/admin)
+
+MODULE=$1
+
+# Install JAC Library to maven local dependency
+mvn install:install-file -Dfile=somos/libs/JAC.jar -DgroupId=com.digitalipvoice.cps -DartifactId=libasn -Dversion=1.0.0 -Dpackaging=jar -DgeneratePom=true
+
+cd library
+mvn clean && mvn install -DSkipTests
+cd ..
+
+cd $MODULE
+mvn clean && mvn package -DskipTests
+cd ..
+
+mkdir -p output
+
+gcp --backup=numbered $MODULE/target/*.jar output/
+
+

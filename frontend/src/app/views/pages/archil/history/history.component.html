@@ -8,7 +8,7 @@
 	<div class="col-md-8">
 		<form (ngSubmit)="onSubmit()" #yourForm="ngForm" [formGroup]="unavailabilityForm">
 			<div class="row">
-				<div class="col-md-6 start_date">
+				<div class="col-md-6 col-sm-6 start_date">
 					<mat-form-field color="accent">
 						<mat-label>Select a Start Date</mat-label>
 						<input matInput [matDatepicker]="picker1" formControlName="startDate" >
@@ -16,7 +16,7 @@
 						<mat-datepicker #picker1></mat-datepicker>
 					</mat-form-field>
 				</div>
-				<div class="col-md-4 end_date">
+				<div class="col-md-4 col-sm-4 end_date">
 					<mat-form-field color="accent">
 						<mat-label>Select an End Date</mat-label>
 						<input matInput [matDatepicker]="picker2" [min]="unavailabilityForm.controls.startDate.value"
@@ -25,7 +25,7 @@
 						<mat-datepicker #picker2 color="primary"></mat-datepicker>
 					</mat-form-field>
 				</div>
-				<div class="col-md-2">
+				<div class="col-md-2 col-sm-2">
 					<button type="submit"  mat-button class="btn btn-primary">Search</button>
 				</div>
 			</div>

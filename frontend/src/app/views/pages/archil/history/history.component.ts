@@ -1,5 +1,4 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {TableData} from './table-data';
 import {AuthService} from '../../../../core/auth/_services';
 import {FormBuilder, FormGroup} from '@angular/forms';
 
@@ -11,13 +10,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 export class HistoryComponent implements OnInit {
 
 	public rows:Array<any> = [];
-	public columns:Array<any> = [
-		{title: 'Name', name: 'name', filtering: {filterString: '', placeholder: 'Filter by title'}},
-		{title: 'Type', name: 'type', sort: '', filtering: {filterString: '', placeholder: 'Filter by type'}},
-		{title: 'Create Date', name: 'createdate', sort: 'asc', filtering: {filterString: '', placeholder: 'Filter by email'}, className: ['email', 'text-success']},
-		{title: 'Sale Date.', name: 'saledate', sort: '', filtering: {filterString: '', placeholder: 'Filter by birthday'}},
-		{title: 'Number', className: 'text-warning', name: 'number'},
-	];
+	public columns:Array<any> = [];
 	public page:number = 1;
 	public itemsPerPage:number = 10;
 	public maxSize:number = 5;
@@ -31,7 +24,7 @@ export class HistoryComponent implements OnInit {
 		className: ['table-striped', 'table-bordered']
 	};
 
-	public data: HistoryData[] = [];
+	public data = [];
 
 	// Start Date and End Date Validation
 	unavailability = { startDate:"", endDate: "" };
@@ -56,9 +49,26 @@ export class HistoryComponent implements OnInit {
 		this.refreshToken = localStorage.getItem('refreshToken');
 
 		this.getUserService.getHistoryData(this.oauthToken).subscribe( result => {
-			Object.keys(result['histories']).forEach((item) => {
-				this.data.push(result['histories'][item])
+
+			// Draw Header
+			let columns = [];
+			let i = 0;
+			Object.keys(result['rows'][0][0]).forEach(item => {
+				let temp = {};
+				temp['title'] = item.toLocaleUpperCase();
+				temp['name'] = item;
+				temp['sort'] = '';
+				temp['sort'] = '';
+				if(i > 0 && i < 5) {
+					temp['filtering'] = {'filterString':'', 'placeholder': 'By ' + item.toLocaleLowerCase()};
+				}
+				i ++;
+				columns.push(temp)
 			});
+			this.columns = columns;
+
+			// Draw Body
+			this.data = result['rows'][0];
 			this.onChangeTable(this.config);
 		});
 	}
@@ -177,29 +187,18 @@ export class HistoryComponent implements OnInit {
 		start_date = start_date ? start_date.toLocaleString() : '';
 		let end_date = this.unavailabilityForm.controls.endDate.value;
 		end_date = end_date ? end_date.toLocaleString() : '';
-		console.log('_-_-_-_', start_date, end_date);
-
 		start_date = this._getDateString(start_date);
 		end_date = this._getDateString(end_date);
-		console.log('_-_-_-_', start_date, end_date.length);
+		if (start_date === '') start_date = '0000-00-00';
+		if (end_date === '') end_date = '9999-12-31';
 
 		let search = {'oauth': this.oauthToken, 'sDate': start_date, 'eDate': end_date};
+		console.log(search);
 		this.getUserService.historySearch(search).subscribe(result => {
-			this.data = [];
-			Object.keys(result['histories']).forEach((item) => {
-				this.data.push(result['histories'][item]);
-			});
+			this.data = result['rows'][0];
 			this.onChangeTable(this.config);
 			this.ref.detectChanges();
 		});
 
 	}
-}
-
-export interface HistoryData {
-	'name': string,
-	'type': string,
-	'createdate': string,
-	'saledate': string,
-	'number': number,
 }

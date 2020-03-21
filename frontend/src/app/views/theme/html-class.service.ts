@@ -49,9 +49,7 @@ export class HtmlClassService {
 		this.initLayout();
 		this.initLoader();
 
-		// init header and subheader menu
 		this.initHeader();
-		this.initSubheader();
 
 		// init aside and aside menu
 		this.initAside();
@@ -96,7 +94,6 @@ export class HtmlClassService {
 		}
 
 		// Offcanvas directions
-		document.body.classList.add('kt-quick-panel--right');
 		document.body.classList.add('kt-demo-panel--right');
 		document.body.classList.add('kt-offcanvas-panel--right');
 	}
@@ -126,27 +123,6 @@ export class HtmlClassService {
 		}
 	}
 
-	/**
-	 * Inin Subheader
-	 */
-	private initSubheader() {
-		// Fixed content head
-		if (objectPath.get(this.config, 'subheader.fixed')) {
-			document.body.classList.add('kt-subheader--fixed');
-		}
-
-		if (objectPath.get(this.config, 'subheader.display')) {
-			document.body.classList.add('kt-subheader--enabled');
-		}
-
-		if (objectPath.has(this.config, 'subheader.style')) {
-			document.body.classList.add('kt-subheader--' + objectPath.get(this.config, 'subheader.style'));
-		}
-	}
-
-	/**
-	 * Init Aside
-	 */
 	private initAside() {
 		if (objectPath.get(this.config, 'aside.self.display') !== true) {
 			return;

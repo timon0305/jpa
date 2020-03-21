@@ -5,7 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GestureConfig, MatProgressSpinnerModule } from '@angular/material';
-import { OverlayModule } from '@angular/cdk/overlay';
 // Angular in memory
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 // Perfect Scroll bar
@@ -30,7 +29,6 @@ import { AppComponent } from './app.component';
 // Modules
 import { AppRoutingModule } from './app-routing.module';
 import { CoreModule } from './core/core.module';
-import { ThemeModule } from './views/theme/theme.module';
 // Partials
 import { PartialsModule } from './views/partials/partials.module';
 // Layout Services
@@ -45,7 +43,6 @@ import {
 	MenuHorizontalService,
 	PageConfigService,
 	SplashScreenService,
-	SubheaderService
 } from './core/_base/layout';
 // Auth
 import { AuthModule } from './views/pages/auth/auth.module';
@@ -61,6 +58,7 @@ import * as scss from 'highlight.js/lib/languages/scss';
 import * as xml from 'highlight.js/lib/languages/xml';
 import * as json from 'highlight.js/lib/languages/json';
 import {ArchilModule} from './views/pages/archil/archil.module';
+import {ThemeModule} from './views/theme/theme.module';
 
 // tslint:disable-next-line:class-name
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -102,7 +100,6 @@ export function hljsLanguages(): HighlightLanguage[] {
 		NgxPermissionsModule.forRoot(),
 		PartialsModule,
 		CoreModule,
-		OverlayModule,
 		StoreModule.forRoot(reducers, {metaReducers}),
 		EffectsModule.forRoot([]),
 		StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
@@ -143,7 +140,6 @@ export function hljsLanguages(): HighlightLanguage[] {
 			useValue: {languages: hljsLanguages}
 		},
 		// template services
-		SubheaderService,
 		MenuHorizontalService,
 		MenuAsideService,
 		HttpUtilsService,

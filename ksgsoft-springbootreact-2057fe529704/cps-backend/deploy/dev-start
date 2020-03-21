@@ -1,0 +1,11 @@
+sudo service cps-auth stop
+sudo service cps-admin stop
+sudo service cps-somos stop
+
+sudo service cps-auth-dev stop
+sudo service cps-admin-dev stop
+sudo service cps-somos-dev stop
+
+sudo service cps-auth-dev start
+sudo service cps-admin-dev start
+sudo service cps-somos-dev start

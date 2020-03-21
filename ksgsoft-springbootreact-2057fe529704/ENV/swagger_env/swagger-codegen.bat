@@ -1,0 +1,1 @@
+java -jar %~dp0\swagger-codegen-cli-3.0.8.jar %*

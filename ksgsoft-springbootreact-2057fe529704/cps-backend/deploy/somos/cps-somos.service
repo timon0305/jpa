@@ -1,0 +1,15 @@
+[Unit]
+Description=cps-somos
+After=syslog.target
+
+[Service]
+User=nmsadmin
+ExecStart=/home/nmsadmin/cps/somos/cps-somos.jar
+SuccessExitStatus=143
+
+# This is important to read application.properties file and application-{profile}.properties file.
+WorkingDirectory=/home/nmsadmin/cps/somos
+
+[Install]
+WantedBy=multi-user.target
+

@@ -18,14 +18,10 @@
 						<!-- begin:: Aside Left -->
 						<ng-container *ngIf="asideDisplay">
 							<button class="kt-aside-close" id="kt_aside_close_btn"><i class="la la-close"></i></button>
-							<kt-aside-left></kt-aside-left>
 						</ng-container>
 						<!-- end:: Aside Left -->
 
 						<div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor" id="kt_content">
-							<!-- begin:: Content Head -->
-							<kt-subheader *ngIf="subheaderDisplay"></kt-subheader>
-							<!-- end:: Content Head -->
 
 							<!-- begin:: Content Body -->
 							<div ktContentAnimate class="kt-container kt-grid__item kt-grid__item--fluid" [ngClass]="{'kt-container--fluid': fluid}">
@@ -42,9 +38,7 @@
 		</div>
 		<!-- end:: Body -->
 
-		<kt-quick-panel></kt-quick-panel>
 		<kt-scroll-top></kt-scroll-top>
-		<kt-sticky-toolbar></kt-sticky-toolbar>
 	</div>
 </ng-container>
 <!-- end:: Page -->

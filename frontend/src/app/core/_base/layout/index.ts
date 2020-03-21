@@ -38,7 +38,6 @@ export { MenuConfigService } from './services/menu-config.service';
 export { MenuHorizontalService } from './services/menu-horizontal.service';
 export { PageConfigService } from './services/page-config.service';
 export { SplashScreenService } from './services/splash-screen.service';
-export { SubheaderService } from './services/subheader.service';
 export { KtDialogService } from './services/kt-dialog.service';
 
 // Server

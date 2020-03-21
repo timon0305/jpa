@@ -1,0 +1,23 @@
+# Build with custom url
+REACT_APP_ENV=$1 yarn run build
+
+REMOTE_PARENT=/home/nmsadmin/cps
+REMOTE=$REMOTE_PARENT/frontend-customer
+
+# Compress to tar
+cd build
+tar -czf ../build.tar.gz .
+cd ..
+
+# deploy to server
+scp build.tar.gz nmsadmin@$2:$REMOTE_PARENT/frontend-customer.tar.gz
+
+rm -f build.tar.gz
+
+# Extract tar file
+ssh -t nmsadmin@$2 "
+            mkdir -p $REMOTE;
+            rm -Rf $REMOTE/*;
+            tar -xzf $REMOTE_PARENT/frontend-customer.tar.gz -C $REMOTE/;
+            rm -f $REMOTE_PARENT/frontend-customer.tar.gz
+"
