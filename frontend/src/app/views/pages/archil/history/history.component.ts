@@ -58,8 +58,7 @@ export class HistoryComponent implements OnInit {
 				temp['title'] = item.toLocaleUpperCase();
 				temp['name'] = item;
 				temp['sort'] = '';
-				temp['sort'] = '';
-				if(i > 0 && i < 5) {
+				if(i > 0 && i < 4) {
 					temp['filtering'] = {'filterString':'', 'placeholder': 'By ' + item.toLocaleLowerCase()};
 				}
 				i ++;
@@ -69,6 +68,14 @@ export class HistoryComponent implements OnInit {
 
 			// Draw Body
 			this.data = result['rows'][0];
+			console.log('dasfdas',this.data);
+			console.log(this.columns);
+			this.config = {
+				paging: true,
+				sorting: {columns: this.columns},
+				filtering: {filterString: ''},
+				className: ['table-striped', 'table-bordered']
+			};
 			this.onChangeTable(this.config);
 		});
 	}
@@ -114,7 +121,7 @@ export class HistoryComponent implements OnInit {
 		let filteredData:Array<any> = data;
 		this.columns.forEach((column:any) => {
 			if (column.filtering) {
-				// console.log(column.filtering);
+				 console.log(column.name);
 				filteredData = filteredData.filter((item:any) => {
 					return item[column.name].match(column.filtering.filterString);
 				});

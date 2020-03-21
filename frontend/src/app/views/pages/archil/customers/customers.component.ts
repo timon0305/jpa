@@ -59,7 +59,6 @@ export class CustomersComponent implements OnInit {
 				temp['title'] = item.toLocaleUpperCase();
 				temp['name'] = item;
 				temp['sort'] = '';
-				temp['sort'] = '';
 				if(i > 0 && i < 5) {
 					temp['filtering'] = {'filterString':'', 'placeholder': 'By ' + item.toLocaleLowerCase()};
 				}
@@ -70,6 +69,12 @@ export class CustomersComponent implements OnInit {
 
 			// Draw Body
 			this.data = result['rows'][0];
+			this.config = {
+				paging: true,
+				sorting: {columns: this.columns},
+				filtering: {filterString: ''},
+				className: ['table-striped', 'table-bordered']
+			};
 			this.onChangeTable(this.config);
 		});
 	}

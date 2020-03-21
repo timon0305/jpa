@@ -49,7 +49,6 @@ export class ProductsComponent implements OnInit {
 
 		// Backend API
 		this.getUserService.getProductsData(this.oauthToken).subscribe(result => {
-
 			// Draw Header
 			let i = 0;
 			let columns = [];
@@ -57,7 +56,7 @@ export class ProductsComponent implements OnInit {
 				let temp = {};
 				temp['title'] = item.toLocaleUpperCase();
 				temp['name'] = item;
-				temp['sort'] = 'true';
+				temp['sort'] = '';
 				if(i > 0 && i < 5) {
 					temp['filtering'] = {'filterString':'', 'placeholder': 'By ' + item.toLocaleLowerCase()};
 				}
@@ -68,6 +67,13 @@ export class ProductsComponent implements OnInit {
 
 			// Draw Body
 			this.data = result['rows'][0];
+			console.log(this.data);
+			this.config = {
+				paging: true,
+				sorting: {columns: this.columns},
+				filtering: {filterString: ''},
+				className: ['table-striped', 'table-bordered']
+			};
 			this.onChangeTable(this.config);
 		});
 	}

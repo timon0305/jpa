@@ -12,9 +12,8 @@ import { environment } from '../../../../environments/environment';
 const API_USERS_URL = 'api/users';
 const API_PERMISSION_URL = 'api/permissions';
 const API_ROLES_URL = 'api/roles';
-// const BASE_URL = 'http://208.73.232.176:8082/api/v1/';
-const BASE_URL = 'http://127.0.0.1:8082/api/v1/';
-// const BASE_URL = 'http://51.15.67.111:8082/api/v1/';
+// const BASE_URL = 'http://127.0.0.1:8082/api/v1/';
+const BASE_URL = 'http://51.15.67.111:8082/api/v1/';
 
 @Injectable()
 export class AuthService {
@@ -23,28 +22,6 @@ export class AuthService {
     login(email: string, password: string): Observable<Object> {
         return this.http.post(BASE_URL + 'session/login', { 'username': email, 'password': password });
     }
-
-    getUserByToken(): Observable<User> {
-        const userToken = localStorage.getItem(environment.authTokenKey);
-        const httpHeaders = new HttpHeaders();
-        httpHeaders.set('Authorization', 'Bearer ' + userToken);
-        return this.http.get<User>(API_USERS_URL, { headers: httpHeaders });
-    }
-
-    register(user: User): Observable<any> {
-        const httpHeaders = new HttpHeaders();
-        httpHeaders.set('Content-Type', 'application/json');
-        return this.http.post<User>(API_USERS_URL, user, { headers: httpHeaders })
-            .pipe(
-                map((res: User) => {
-                    return res;
-                }),
-                catchError(err => {
-                    return null;
-                })
-            );
-    }
-
     // getProductsData
 	getProductsData(oauthToken): Observable<Object> {
 		let httpHeaders = new HttpHeaders();
@@ -153,6 +130,28 @@ export class AuthService {
     }
 
 
+
+	// Get Token Info..
+	getUserByToken(): Observable<User> {
+		const userToken = localStorage.getItem(environment.authTokenKey);
+		const httpHeaders = new HttpHeaders();
+		httpHeaders.set('Authorization', 'Bearer ' + userToken);
+		return this.http.get<User>(API_USERS_URL, { headers: httpHeaders });
+	}
+
+	register(user: User): Observable<any> {
+		const httpHeaders = new HttpHeaders();
+		httpHeaders.set('Content-Type', 'application/json');
+		return this.http.post<User>(API_USERS_URL, user, { headers: httpHeaders })
+			.pipe(
+				map((res: User) => {
+					return res;
+				}),
+				catchError(err => {
+					return null;
+				})
+			);
+	}
     // DELETE => delete the user from the server
 	deleteUser(userId: number) {
 		const url = `${API_USERS_URL}/${userId}`;
