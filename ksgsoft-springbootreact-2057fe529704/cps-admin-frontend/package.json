@@ -24,7 +24,7 @@
     "immer": "^2.1.5",
     "moment": "^2.24.0",
     "multi-select-react": "^0.1.8",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.1",
     "prop-types": "15.7.2",
     "react": "^16.8.6",
     "react-app-polyfill": "^0.2.2",
