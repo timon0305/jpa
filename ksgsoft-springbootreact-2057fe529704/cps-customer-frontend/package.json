@@ -21,7 +21,7 @@
     "enzyme-adapter-react-16": "^1.6.0",
     "flag-icon-css": "^3.2.0",
     "font-awesome": "^4.7.0",
-    "immer": "^2.1.5",
+    "immer": "^8.0.1",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
     "node-sass": "^4.9.3",
