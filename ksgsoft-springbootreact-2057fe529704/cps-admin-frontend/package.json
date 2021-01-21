@@ -21,7 +21,7 @@
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",
     "http-proxy-middleware": "^0.19.1",
-    "immer": "^2.1.5",
+    "immer": "^8.0.1",
     "moment": "^2.24.0",
     "multi-select-react": "^0.1.8",
     "node-sass": "^4.11.0",
