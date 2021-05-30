@@ -47,7 +47,7 @@
     "simple-line-icons": "^2.4.1",
     "sprintf-js": "^1.1.2",
     "validator": "^10.11.0",
-    "ws": "^7.0.0"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "react-scripts": "^2.0.4"
