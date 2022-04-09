@@ -22,7 +22,7 @@
     "font-awesome": "^4.7.0",
     "http-proxy-middleware": "^0.19.1",
     "immer": "^2.1.5",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "multi-select-react": "^0.1.8",
     "node-sass": "^4.11.0",
     "prop-types": "15.7.2",
